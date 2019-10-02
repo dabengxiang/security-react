@@ -19,9 +19,14 @@ export default {
       return yield call(request.getOrderInfo,data);
 
     },
-    *layout({data},{ call, put }){
-      return yield call(request.layout);
-
+    *logout({data},{ call, put }){
+      return yield call(request.logout);
+    },
+    *me({data},{ call, put }){
+      return yield call(request.me);
+    },
+    *sessionLogout({data},{ call, put }){
+      return yield call(request.sessionLogout);
     }
   },
 

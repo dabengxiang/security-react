@@ -21,7 +21,8 @@ class Login extends React.Component{
         orderInfo: {
             id: '',
             name: ''
-        }
+        },
+        meFlag : '0'
     }
 
 
@@ -44,14 +45,22 @@ class Login extends React.Component{
 
 
       componentDidMount(){
-          let isAuth = sessionStorage.getItem("isAuth");
-          console.log(isAuth);
-          if(isAuth === "1"){
-            this.setState({isAuth: '1'});         
-        
-        }
+   
+        let isAuth; 
+        this.props.dispatch({type:'login/me',data:''}).then(res => {
+            if(res !== null && res.code === 200 && res.data!=null){
+                console.log("1111111111");
+                this.setState({isAuth: '1'});         
+            }
+            this.setState({meFlag: '1'});        
+
+        })
+
+
       }
 
+
+   
 
       getLoginHtml(){
         const { getFieldDecorator } = this.props.form;
@@ -99,6 +108,19 @@ class Login extends React.Component{
       }
 
 
+      ToLoginPage(){
+        // window.location.href='www.baidu.com';
+
+        if(this.state.meFlag === '1'){
+            window.location.href = "http://auth.immoc.com:9090/oauth/authorize?" +
+            'client_id=admin&' +
+            'redirect_uri=http://admin.immoc.com:8070/oauth/callback&' +
+            'response_type=code';
+        }
+        this.state.meFlag === '0';
+
+      }
+
       getOrderInfo(){
           this.props.dispatch({type:'login/getOrderInfo',data:2}).then(res => {
               this.setState({orderInfo:res});
@@ -106,10 +128,21 @@ class Login extends React.Component{
       }
 
 
-      layout(){
-        this.props.dispatch({type:'login/layout'}).then(res => {
+
+      //这是密码模式的logout 
+      passwordlogout(){
+        this.props.dispatch({type:'login/logout'}).then(res => {
             sessionStorage.removeItem("isAuth");
         });
+      }
+
+
+      //验证码session管理的logout
+      sessionLogout(){
+        this.props.dispatch({type:'login/sessionLogout'}).then(res => {
+            window.location.href = "http://auth.immoc.com:9090/logout?redirect_uri=http://admin.immoc.com:8000";
+        
+        }); 
       }
 
 
@@ -123,7 +156,7 @@ class Login extends React.Component{
             {
 
                 this.state.isAuth === '0' ? 
-                this.getLoginHtml(): 
+                this.ToLoginPage(): 
                 <div style={{ width:'350px', margin:'auto' ,marginTop:'300px'}}>
                    <div style={{ fontSize:'large',fontWeight:'bolder' ,color:'blue'}}>
                         welcome to the immoc security
@@ -140,16 +173,16 @@ class Login extends React.Component{
                         getOrderInfo
                     </Button>
                     <br/><br/>
-                    <Button type="primary" onClick={()=>this.layout()}>
-                        layout
+                    <Button type="primary" onClick={()=>this.sessionLogout()}>
+                        logout
                     </Button>
 
                 </div>
 
             }
 
-
             </div>
+
            
         )
   

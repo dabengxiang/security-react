@@ -4,8 +4,7 @@
  ],
    "proxy": {
     "/admin": {
-      "target": "http://127.0.0.1:8070",
-      "changeOrigin": true,
+      "target": "http://admin.immoc.com:8070",
     "pathRewrite": {
         "^/admin": "/"
       }

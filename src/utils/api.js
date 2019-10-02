@@ -14,8 +14,18 @@ import * as api from './AxiosUtil';
  }
 
 
- export function layout(data){
-    return postForm("admin/layout");
+ export function logout(data){
+    return postForm("admin/logout");
  }
  
+ 
+ export function me(data){
+    return get("admin/me");
+ }
+
+ 
+ export function sessionLogout(data){
+    return postForm("admin/sessionLogout");
+ }
+
  
