@@ -26,7 +26,7 @@ export default {
       return yield call(request.me);
     },
     *sessionLogout({data},{ call, put }){
-      return yield call(request.sessionLogout);
+      return  yield call(request.sessionLogout);
     }
   },
 

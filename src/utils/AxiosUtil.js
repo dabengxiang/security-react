@@ -1,91 +1,43 @@
 import axios from "axios";
 import { Modal, message } from "antd";
 import qs from 'qs';
+import * as api  from "./api";
+
 const confirm = Modal.confirm;
 
-window.flag = false; //µ¯³ö²ã±ê¼Ç
+window.flag = false; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-// ÇëÇó³¬Ê±[config]:showTimeout    1.[true]:ÏÔÊ¾ÌáÊ¾ 2.["again"]:ÏÔÊ¾ÔÙ´ÎÌáÊ¾µ¯³ö¿ò
+// ï¿½ï¿½ï¿½ï¿½Ê±[config]:showTimeout    1.[true]:ï¿½ï¿½Ê¾ï¿½ï¿½Ê¾ 2.["again"]:ï¿½ï¿½Ê¾ï¿½Ù´ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 axios.defaults.timeout = 6000;
 axios.defaults.withCredentials = true;
 axios.defaults.headers["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, PUT, DELETE, OPTIONS";
 axios.defaults.headers["Access-Control-Allow-Headers"] = "Origin, Content-Type, X-Auth-Token";
-axios.defaults.headers.get["X-Requested-With"] = "XMLHttpRequest"; //Ajax getÇëÇó±êÊ¶
-axios.defaults.headers.post["X-Requested-With"] = "XMLHttpRequest"; //Ajax postÇëÇó±êÊ¶
-axios.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=utf-8"; //POSTÇëÇó²ÎÊý»ñÈ¡²»µ½µÄÎÊÌâ
-axios.defaults.headers.post["Accept"] = "application/json"; //POSTÇëÇó²ÎÊý»ñÈ¡²»µ½µÄÎÊÌâ
-axios.defaults.headers.put["X-Requested-With"] = "XMLHttpRequest"; //Ajax putÇëÇó±êÊ¶
-axios.defaults.headers.delete["X-Requested-With"] = "XMLHttpRequest"; //Ajax deleteÇëÇó±êÊ¶
+axios.defaults.headers.get["X-Requested-With"] = "XMLHttpRequest"; //Ajax getï¿½ï¿½ï¿½ï¿½ï¿½Ê¶
+axios.defaults.headers.post["X-Requested-With"] = "XMLHttpRequest"; //Ajax postï¿½ï¿½ï¿½ï¿½ï¿½Ê¶
+axios.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=utf-8"; //POSTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+axios.defaults.headers.post["Accept"] = "application/json"; //POSTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+axios.defaults.headers.put["X-Requested-With"] = "XMLHttpRequest"; //Ajax putï¿½ï¿½ï¿½ï¿½ï¿½Ê¶
+axios.defaults.headers.delete["X-Requested-With"] = "XMLHttpRequest"; //Ajax deleteï¿½ï¿½ï¿½ï¿½ï¿½Ê¶
 
 axios.interceptors.response.use(
     function(response) {
-        // ÓÃ»§Î´ÊÚÈ¨£¬Ò³ÃæÌø×ªµ½µÇÂ¼Ò³Ãæ
-        if (response.status == 401 && response.data.code == "53000010" && !window.loginWarnflag) {
-            window.loginWarnflag = true; // ±ê¼Çµ±Ç°ÊÇ·ñÓÐµÇÂ¼ÌáÊ¾µ¯³ö¿ò
-            const returnUrl = encodeURIComponent(window.location.href); // µÇÂ¼ºóÐè·µ»ØµÄ url
-            Modal.warning({
-                title: "ÌáÊ¾",
-                key: "1",
-                content: "»á»°ÒÑ¹ýÆÚ£¡",
-                okText: "ÖØÐÂµÇÂ¼",
-                onOk() {
-                    // Çå¿Õ»º´æ
-                    console.log('***************************sessionStorage.clear()1******************************')
-                    sessionStorage.clear();
-                    window.loginWarnflag = false; // ÖØÖÃ
-                    // window.location = deployBaseR + `${auth.loginUri}?returnUrl=${returnUrl}`;
-                }
-            });
-        }
+        // console.log("è¿›æ¥äº†");
+        // if (response.status == 500 && response.message == "refresh fail" ) {
+        //         console.log("è¿›æ¥äº†");
+        // }
         return response;
     },
     function(error) {
-		// ÇëÇó³¬Ê±[config]:showTimeout    1.[true]:ÏÔÊ¾ÌáÊ¾ 2.["again"]:ÏÔÊ¾ÔÙ´ÎÌáÊ¾µ¯³ö¿ò
-        if (
-            error.config.showTimeout &&
-            error.code == "ECONNABORTED" &&
-            error.message.indexOf("timeout") != -1 &&
-            !window.timeoutWarnflag
-        ) {
-            window.timeoutWarnflag = true; // ±ê¼Çµ±Ç°ÊÇ·ñÓÐ³¬Ê±ÌáÊ¾µ¯³ö¿ò
-            if (error.config.showTimeout == "again") {
-                const timeoutModal = confirm({
-                    title: "ÌáÊ¾",
-                    content: "ÇëÇó³¬Ê±ÊÇ·ñÖØÊÔ£¿",
-                    onOk: () => {
-                        timeoutModal.destroy();
-                        window.timeoutWarnflag = false; // ÖØÖÃ
-                        return axios.request(error.config);
-                    },
-                    onCancel: () => {
-                        window.timeoutWarnflag = false; // ÖØÖÃ
-                    }
-                });
-            } else {
-                message.warning("ÇëÇó³¬Ê±!", 3, () => {
-                    window.timeoutWarnflag = false; // ÖØÖÃ
-                });
-            }
-        }
-        // ÓÃ»§Î´ÊÚÈ¨£¬Ò³ÃæÌø×ªµ½µÇÂ¼Ò³Ãæ
-        if (error.response.status == 401 && error.response.data.code == "53000010" && !window.loginWarnflag) {
-            window.loginWarnflag = true; // ±ê¼Çµ±Ç°ÊÇ·ñÓÐµÇÂ¼ÌáÊ¾µ¯³ö¿ò
-            const returnUrl = encodeURIComponent(window.location.href); // µÇÂ¼ºóÐè·µ»ØµÄ url
-            Modal.warning({
-                title: "ÌáÊ¾",
-                key: "1",
-                content: "»á»°ÒÑ¹ýÆÚ£¡",
-                okText: "ÖØÐÂµÇÂ¼",
-                onOk() {
-                    // Çå¿Õ»º´æ
-                    console.log('***************************sessionStorage.clear()2******************************')
-                    sessionStorage.clear();
+        console.log(error.response);
 
-                    window.loginWarnflag = false; // ÖØÖÃ
-                    // window.location = deployBaseR + `${auth.loginUri}?returnUrl=${returnUrl}`;
+        if (error.response.status == 500 && error.response.data.message == "refresh fail" ) {
+            api.sessionLogout().then(res=>{
+                if(res.code === 200){
+                    window.location.href = "http://auth.immoc.com:9090/logout?redirect_uri=http://admin.immoc.com:8000";
                 }
             });
+
         }
         return error.response;
     }
@@ -93,10 +45,10 @@ axios.interceptors.response.use(
 
 axios.interceptors.request.use(function(config) {
     // const user = JSON.parse(Cookies.get("user") || "{}");
-    // Ã»ÓÐµÇÂ¼Ìøµ½µÇÂ¼Ò³
+    // Ã»ï¿½Ðµï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼Ò³
     // if (!user.userName) {
-    //     // ÅÅ³ýÂ·¾¶
-    //     let isAuthPath = true; // ÊÇ·ñÐèÈÏÖ¤Â·¾¶
+    //     // ï¿½Å³ï¿½Â·ï¿½ï¿½
+    //     let isAuthPath = true; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤Â·ï¿½ï¿½
     //     if (auth.excludePaths && auth.excludePaths.length > 0) {
     //         for (let excludePath of auth.excludePaths) {
     //             let regexp = new RegExp(excludePath);
@@ -108,18 +60,18 @@ axios.interceptors.request.use(function(config) {
 
     //     if (isAuthPath) {
     //         if (!window.loginWarnflag) {
-    //             window.loginWarnflag = true; // ±ê¼Çµ±Ç°ÊÇ·ñÓÐµÇÂ¼ÌáÊ¾µ¯³ö¿ò
-    //             const returnUrl = encodeURIComponent(window.location.href); // µÇÂ¼ºóÐè·µ»ØµÄ url
+    //             window.loginWarnflag = true; // ï¿½ï¿½Çµï¿½Ç°ï¿½Ç·ï¿½ï¿½Ðµï¿½Â¼ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //             const returnUrl = encodeURIComponent(window.location.href); // ï¿½ï¿½Â¼ï¿½ï¿½ï¿½è·µï¿½Øµï¿½ url
     //             Modal.warning({
-    //                 title: "ÌáÊ¾",
+    //                 title: "ï¿½ï¿½Ê¾",
     //                 key: "1",
-    //                 content: "»á»°ÒÑ¹ýÆÚ£¡",
-    //                 okText: "ÖØÐÂµÇÂ¼",
+    //                 content: "ï¿½á»°ï¿½Ñ¹ï¿½ï¿½Ú£ï¿½",
+    //                 okText: "ï¿½ï¿½ï¿½Âµï¿½Â¼",
     //                 onOk() {
-    //                     // Çå¿Õ»º´æ
+    //                     // ï¿½ï¿½Õ»ï¿½ï¿½ï¿½
     //                     sessionStorage.clear();
 
-    //                     window.loginWarnflag = false; // ÖØÖÃ
+    //                     window.loginWarnflag = false; // ï¿½ï¿½ï¿½ï¿½
     //                     window.location = deployBaseR + `${auth.loginUri}?returnUrl=${returnUrl}`;
     //                 }
     //             });
@@ -128,7 +80,7 @@ axios.interceptors.request.use(function(config) {
     //     }
     // }
 
-    //Ìí¼ÓgetÇëÇó²ÎÊý
+    //ï¿½ï¿½ï¿½getï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if (config.method == "get") {
         config.params = {
             ...config.params,
@@ -156,7 +108,7 @@ export function query(url, params, config = {}) {
     });
 }
 
-// µ¼³öÊý¾Ý
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 export function exportDataExcel(url, params, config = {}) {
     return new Promise((resolve, reject) => {
         axios
@@ -170,7 +122,7 @@ export function exportDataExcel(url, params, config = {}) {
     });
 }
 
-// µ¼³öÄ£°å
+// ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
 export function exportTemplateExcel(url, params, config = {}) {
     return new Promise((resolve, reject) => {
         axios
@@ -183,7 +135,7 @@ export function exportTemplateExcel(url, params, config = {}) {
             });
     });
 }
-//Excelµ¼ÈëpostÇëÇó»áÓÐpost²ÎÊýÒ²¿ÉÄÜÓÐget²ÎÊý,ÇëÇóµÄÒ»Ð©ÏµÁÐÅäÖÃ
+//Excelï¿½ï¿½ï¿½ï¿½postï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½postï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½getï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ð©Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 export function importExcel(url, datas, config) {
     return new Promise((resolve, reject) => {
         axios.post(url,datas,config).then(res => {
@@ -194,7 +146,7 @@ export function importExcel(url, datas, config) {
     })
 }
 
-//postÇëÇó»áÓÐpost²ÎÊýÒ²¿ÉÄÜÓÐget²ÎÊý
+//postï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½postï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½getï¿½ï¿½ï¿½ï¿½
 export function post(url, datas, params, config = {}) {
     return new Promise((resolve, reject) => {
         axios

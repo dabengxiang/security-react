@@ -48,8 +48,9 @@ class Login extends React.Component{
    
         let isAuth; 
         this.props.dispatch({type:'login/me',data:''}).then(res => {
+            console.log(res);
+
             if(res !== null && res.code === 200 && res.data!=null){
-                console.log("1111111111");
                 this.setState({isAuth: '1'});         
             }
             this.setState({meFlag: '1'});        
