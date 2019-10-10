@@ -48,12 +48,16 @@ class Login extends React.Component{
    
         let isAuth; 
         this.props.dispatch({type:'login/me',data:''}).then(res => {
-            console.log(res);
+            // console.log(res);
+            // if(res !== null){
+            //     this.setState({isAuth: '1'});         
+            // }
 
+            //session得
             if(res !== null && res.code === 200 && res.data!=null){
                 this.setState({isAuth: '1'});         
             }
-            this.setState({meFlag: '1'});        
+            // this.setState({meFlag: '1'});        
 
         })
 
@@ -113,6 +117,7 @@ class Login extends React.Component{
         // window.location.href='www.baidu.com';
 
         if(this.state.meFlag === '1'){
+
             window.location.href = "http://auth.immoc.com:9090/oauth/authorize?" +
             'client_id=admin&' +
             'redirect_uri=http://admin.immoc.com:8070/oauth/callback&' +
@@ -147,6 +152,14 @@ class Login extends React.Component{
       }
 
 
+         //验证码session管理的logout
+    tokenLogout(){
+        this.props.dispatch({type:'login/tokenLogout'}).then(res => {
+            window.location.href = "http://auth.immoc.com:9090/logout?redirect_uri=http://admin.immoc.com:8000";
+        
+        }); 
+        }
+
     render(){
 
         
@@ -174,7 +187,7 @@ class Login extends React.Component{
                         getOrderInfo
                     </Button>
                     <br/><br/>
-                    <Button type="primary" onClick={()=>this.sessionLogout()}>
+                    <Button type="primary" onClick={()=>this.tokenLogout()}>
                         logout
                     </Button>
 

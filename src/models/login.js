@@ -27,6 +27,10 @@ export default {
     },
     *sessionLogout({data},{ call, put }){
       return  yield call(request.sessionLogout);
+    },
+    *tokenLogout({data},{ call, put }){
+      return  yield call(request.tokenLogout);
+
     }
   },
 

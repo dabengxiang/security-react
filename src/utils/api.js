@@ -20,7 +20,9 @@ import * as api from './AxiosUtil';
  
  
  export function me(data){
-    return get("admin/me");
+    // return get("admin/me");
+
+    return get("admin/api/user/me");
  }
 
  
@@ -28,4 +30,8 @@ import * as api from './AxiosUtil';
     return postForm("admin/sessionLogout");
  }
 
+ 
+ export function tokenLogout(data){
+    return postForm("admin/tokenLogout");
+ }
  

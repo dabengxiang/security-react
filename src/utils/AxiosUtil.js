@@ -32,10 +32,15 @@ axios.interceptors.response.use(
         console.log(error.response);
 
         if (error.response.status == 500 && error.response.data.message == "refresh fail" ) {
-            api.sessionLogout().then(res=>{
+            api.tokenLogout().then(res=>{
                 if(res.code === 200){
-                    window.location.href = "http://auth.immoc.com:9090/logout?redirect_uri=http://admin.immoc.com:8000";
-                }
+                    // window.location.href = "http://auth.immoc.com:9090/logout?redirect_uri=http://admin.immoc.com:8000";
+                    
+                    window.location.href = "http://auth.immoc.com:9090/oauth/authorize?" +
+                    'client_id=admin&' +
+                    'redirect_uri=http://admin.immoc.com:8070/oauth/callback&' +
+                    'response_type=code';
+                        }
             });
 
         }
